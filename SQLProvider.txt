@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Configuration;
+using System.Data.SqlClient;
+using Final_Project.Models;
+
+namespace Final_Project.Data_Provider
+{
+    public class BusinessDays
+    {
+        string connectionString = "";
+
+        public BusinessDays()
+        {
+           connectionString =  WebConfigurationManager.ConnectionStrings["MyDB4099"].ConnectionString;
+        }
+
+        public int CalculateBusinessDays(DateTime checkIn, DateTime checkout, int countryId)
+        {
+            List<DateTime> specialDays = new List<DateTime>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string myQuery = "select cast(holidayDate AS datetime) as holidayDate from holidayTable where countryID=" + countryId;
+                SqlCommand cmd = new SqlCommand(myQuery,con);
+                con.Open();
+                SqlDataReader sdr = new SqlDataReader();
+                while (sdr.Read()){
+                    DateTime myHolidays = Convert.ToDateTime(sdr["holidayDate"]);
+                    specialDays.Add(myHolidays);
+                }
+                con.Close();
+            }
+            int days = 0;
+            for (DateTime date = checkIn; date <= checkout; date = date.AddDays(1))
+            {
+                if (countryId == 1)
+                {
+                    if (checkIn.DayOfWeek != DayOfWeek.Saturday ||  !specialDays.Contains(date))
+                    {
+                        days++;
+                    }
+                    checkIn = checkIn.AddDays(1);
+                }
+                if (countryId == 2)
+                {
+                    if (checkIn.DayOfWeek != DayOfWeek.Saturday || !specialDays.Contains(date))
+                    {
+                        days++;
+                    }
+                    checkIn = checkIn.AddDays(1);
+                }
+            }
+        }
+        public bool isPublicHoliday(DateTime date, List<Holiday> myList)
+        {
+            for (int i = 0; i < myList.Count; i++)
+            {
+                if (myList[i].holidayDate == date)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+}

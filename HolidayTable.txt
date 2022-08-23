@@ -1,0 +1,44 @@
+create table holidayTable(
+Id int identity(1,1) not null,
+holidayName varchar(50) not null,
+holidayDate date not null,
+countryID int Foreign Key References countryTable(countryID));
+
+Select *from holidayTable;
+
+INSERT INTO holidayTable(holidayName,holidayDate,countryID)
+VALUES ('Pakistan Day','2022-03-23',1),
+('Labour Day','2022-05-1',1),
+('Eid-ul-Fitr','2022-05-2',1),
+('Eid-ul-Fitr','2022-05-3',1),
+('Eid-ul-Fitr','2022-05-4',1),
+('Eid-ul-Fitr','2022-05-5',1),
+('Eid-ul-Azha','2022-07-10',1),
+('Eid-ul-Azha','2022-07-11',1),
+('Eid-ul-Azha','2022-07-12',1),
+('Ashura','2022-08-8',1),
+('Ashura','2022-08-9',1),
+('Independance Day','2022-08-14',1),
+('Milad-un-Nabi','2022-10-9',1),
+('Qaid-e-Azam Day','2022-12-25',1);
+
+
+INSERT INTO holidayTable(holidayName,holidayDate,countryID)
+VALUES ('New Year','2022-01-01',2),
+('Eid-ul-Fitr','2022-05-1',2),
+('Eid-ul-Fitr','2022-05-2',2),
+('Eid-ul-Fitr','2022-05-3',2),
+('Eid-ul-Fitr','2022-05-5',2),
+('Arafat Day','2022-07-8',2),
+('Eid-ul-Azha','2022-07-9',2),
+('Eid-ul-Azha','2022-07-10',2),
+('Eid-ul-Azha','2022-07-11',2),
+('Islamic New Year','2022-08-31',2),
+('The Prophet Bithday','2022-10-9',2),
+('Commemoration Day','2022-12-1',2),
+('UAE National Day','2022-12-2',2),
+('UAE National Day','2022-12-3',2);
+
+Select DATENAME (dw,holidayDate), holidayDate from dbo.holidayTable;
+
+select cast(holidayDate AS datetime) as dateofhol from holidayTable
