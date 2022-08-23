@@ -1,0 +1,98 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Configuration;
+using System.Data.SqlClient;
+using Final_Project.Models;
+
+namespace Final_Project.Data_Layer
+{
+    public class DataPovider
+    {
+
+        string connectionString = "";
+
+        public DataPovider()
+        {
+            connectionString = WebConfigurationManager.ConnectionStrings["MyDB4099"].ConnectionString;
+        }
+
+        public List<Country> GetCountryList()
+        {
+            List<Country> myCountry = new List<Country>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand("Select *from countryTable", con);
+
+                con.Open();
+
+                SqlDataReader sdr = cmd.ExecuteReader();
+                while (sdr.Read())
+                {
+                    Country country = new Country();
+                    country.countryID = Convert.ToInt32(sdr["countryID"]);
+                    country.countryName = sdr["countryName"].ToString();
+                    country.countryCurrency = sdr["countryCurrency"].ToString();
+                    country.currencyCode = sdr["currencyCode"].ToString();
+                    country.countryWeekend = sdr["countryWeekend"].ToString();
+                    country.countryTax = Convert.ToInt32(sdr["countryTax"]);
+                    country.countryPenaltyRate = Convert.ToInt32(sdr["countryPenaltyRate"]);
+                    myCountry.Add(country);
+                }
+                con.Close();
+            }
+            return myCountry;
+        }
+
+        public int CalculateBusinessDays(DateTime checkIn, DateTime checkout, int countryId)
+        {
+            List<DateTime> specialDays = new List<DateTime>();
+            using (SqlConnection con = new SqlConnection(connectionString))
+            {
+                string myQuery = "select cast(holidayDate AS datetime) as holidayDate from holidayTable where countryID=" + countryId;
+                SqlCommand cmd = new SqlCommand(myQuery, con);
+                con.Open();
+                SqlDataReader sdr = cmd.ExecuteReader();
+                while (sdr.Read())
+                {
+                    DateTime myHolidays = Convert.ToDateTime(sdr["holidayDate"]);
+                    specialDays.Add(myHolidays);
+                }
+                con.Close();
+            }
+            int days = 0;
+            for (DateTime date = checkIn; date <= checkout; date = date.AddDays(1))
+            {
+                if (countryId == 1)
+                {
+                    if (checkIn.DayOfWeek != DayOfWeek.Saturday || !specialDays.Contains(date))
+                    {
+                        days++;
+                    }
+                    checkIn = checkIn.AddDays(1);
+                }
+                if (countryId == 2)
+                {
+                    if (checkIn.DayOfWeek != DayOfWeek.Saturday || !specialDays.Contains(date))
+                    {
+                        days++;
+                    }
+                    checkIn = checkIn.AddDays(1);
+                }
+            }
+            return days;
+        }
+       /* public bool isPublicHoliday(DateTime date, List<Holiday> myList)
+        {
+            for (int i = 0; i < myList.Count; i++)
+            {
+                if (myList[i].holidayDate == date)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }*/
+    }
+}
