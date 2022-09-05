@@ -1,0 +1,6 @@
+Create Procedure spGetSpecificCountry
+@countryID int
+As
+Begin
+	Select * from countryTable where countryID = @countryID
+End
