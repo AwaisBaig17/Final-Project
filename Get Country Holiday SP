@@ -2,5 +2,5 @@ Create Procedure spGetSpecificCountryHolidays
 @countryID int
 As
 Begin
-	Select * from holidayTable where countryID = @countryID
+ Select cast(holidayDate AS datetime) as holidayDate from holidayTable where countryID = @countryID
 End
