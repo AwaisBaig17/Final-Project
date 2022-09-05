@@ -1,0 +1,7 @@
+Create procedure dbo.spGetCountries
+As
+Begin
+Select *from countryTable
+End
+
+exec dbo.spGetCountries
